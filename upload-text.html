@@ -1,0 +1,278 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tải lên tài liệu - Modern Minimalism</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        
+        :root {
+            --primary-color: #176754;
+            --primary-hover: #125243;
+            --bg-color: #EBF6F4;
+            --text-dark: #0f2d26;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+        }
+
+        .drop-zone--active {
+            border-color: var(--primary-color);
+            background-color: rgba(23, 103, 84, 0.05);
+            transform: scale(1.01);
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        /* Primary Button Styles */
+        .btn-upload {
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-upload:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(23, 103, 84, 0.25);
+            transform: translateY(-1px);
+        }
+        .btn-upload:active:not(:disabled) {
+            transform: translateY(0) scale(0.98);
+        }
+        .btn-upload:disabled {
+            background-color: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+        
+        .upload-badge {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid rgba(23, 103, 84, 0.15);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-6 md:p-12 flex flex-col items-center">
+
+    <!-- Header -->
+    <div class="w-full max-w-2xl text-center mb-12">
+        <h1 class="text-4xl font-light tracking-tight mb-3 text-[#176754]">Tải lên tài liệu</h1>
+        <p class="text-slate-600 font-light text-lg">Hệ thống lưu trữ tài liệu tối giản và an toàn.</p>
+    </div>
+
+    <div class="w-full max-w-2xl space-y-8">
+        
+        <!-- Upload Zone -->
+        <div id="drop-zone" class="relative group border-2 border-dashed border-slate-200 bg-white rounded-3xl p-12 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer hover:border-[#176754]/40 hover:shadow-sm">
+            <input type="file" id="file-input" multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+            
+            <div id="upload-icon-container" class="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-6 transition-colors duration-300">
+                <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-400 group-hover:text-[#176754] transition-colors"></i>
+            </div>
+
+            <div class="text-center">
+                <p class="text-lg font-medium mb-1">Kéo và thả tệp vào đây</p>
+                <p class="text-sm text-slate-400 font-light">hoặc nhấn để duyệt tệp từ thiết bị</p>
+            </div>
+            
+            <div class="mt-6 flex gap-3">
+                <span class="px-3 py-1 upload-badge rounded-full text-[10px] font-semibold uppercase tracking-wider">PDF</span>
+                <span class="px-3 py-1 upload-badge rounded-full text-[10px] font-semibold uppercase tracking-wider">DOCX</span>
+                <span class="px-3 py-1 upload-badge rounded-full text-[10px] font-semibold uppercase tracking-wider">IMAGE</span>
+            </div>
+        </div>
+
+        <!-- File List Container -->
+        <div id="file-list-container" class="hidden bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden animate-fade-in">
+            <div class="px-6 py-4 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
+                <h3 id="file-count-label" class="text-sm font-semibold text-slate-700">Danh sách tệp (0)</h3>
+                <button id="clear-all" class="text-xs text-slate-400 hover:text-red-500 transition-colors">Xóa tất cả</button>
+            </div>
+            <div id="file-list" class="divide-y divide-slate-50 max-h-[300px] overflow-y-auto custom-scrollbar">
+                <!-- File items injected here -->
+            </div>
+        </div>
+
+        <!-- Feedback Message -->
+        <div id="success-message" class="hidden p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center space-x-3 text-emerald-700 animate-fade-in">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <span class="text-sm font-medium">Tải lên thành công! Tài liệu của bạn đã được lưu trữ.</span>
+        </div>
+
+        <!-- Action Button -->
+        <button id="upload-btn" disabled class="w-full py-4 rounded-2xl font-medium flex items-center justify-center space-x-2 btn-upload">
+            <span id="btn-text">Bắt đầu tải lên</span>
+        </button>
+
+        <!-- Footer Info -->
+        <div class="text-center pt-4">
+            <p class="text-xs text-slate-400 flex items-center justify-center space-x-2">
+                <i data-lucide="shield-check" class="w-4 h-4 text-[#176754]"></i>
+                <span>Tài liệu được mã hóa đầu cuối. Tối đa 50MB/tệp.</span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Khởi tạo icons Lucide
+        lucide.createIcons();
+
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileList = document.getElementById('file-list');
+        const fileListContainer = document.getElementById('file-list-container');
+        const fileCountLabel = document.getElementById('file-count-label');
+        const clearAllBtn = document.getElementById('clear-all');
+        const uploadBtn = document.getElementById('upload-btn');
+        const btnText = document.getElementById('btn-text');
+        const successMessage = document.getElementById('success-message');
+        const uploadIconContainer = document.getElementById('upload-icon-container');
+
+        let selectedFiles = [];
+
+        // Xử lý kéo thả (Drag & Drop)
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drop-zone--active');
+                uploadIconContainer.classList.replace('bg-slate-50', 'bg-emerald-50');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drop-zone--active');
+                uploadIconContainer.classList.replace('bg-emerald-50', 'bg-slate-50');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const files = Array.from(e.dataTransfer.files);
+            addFiles(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            addFiles(files);
+        });
+
+        function addFiles(newFiles) {
+            newFiles.forEach(file => {
+                const isDuplicate = selectedFiles.some(f => f.name === file.name && f.size === file.size);
+                if (!isDuplicate) {
+                    selectedFiles.push(file);
+                }
+            });
+            successMessage.classList.add('hidden');
+            renderFileList();
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            renderFileList();
+        }
+
+        function formatSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileIconName(type) {
+            if (type.includes('image')) return 'image';
+            if (type.includes('video')) return 'video';
+            if (type.includes('audio')) return 'music';
+            return 'file-text';
+        }
+
+        function renderFileList() {
+            fileList.innerHTML = '';
+            
+            if (selectedFiles.length > 0) {
+                fileListContainer.classList.remove('hidden');
+                fileCountLabel.textContent = `Danh sách tệp (${selectedFiles.length})`;
+                uploadBtn.disabled = false;
+            } else {
+                fileListContainer.classList.add('hidden');
+                uploadBtn.disabled = true;
+            }
+
+            selectedFiles.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'px-6 py-4 flex items-center justify-between group hover:bg-slate-50/50 transition-colors';
+                
+                const iconName = getFileIconName(file.type);
+
+                item.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <div class="p-2 bg-white border border-slate-100 rounded-xl">
+                            <i data-lucide="${iconName}" class="w-5 h-5 text-[#176754]"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-900 truncate max-w-[200px] md:max-w-xs">${file.name}</p>
+                            <p class="text-xs text-slate-400">${formatSize(file.size)}</p>
+                        </div>
+                    </div>
+                    <button onclick="removeFile(${index})" class="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all md:opacity-0 group-hover:opacity-100">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                `;
+                fileList.appendChild(item);
+            });
+            
+            lucide.createIcons();
+        }
+
+        clearAllBtn.addEventListener('click', () => {
+            selectedFiles = [];
+            renderFileList();
+        });
+
+        uploadBtn.addEventListener('click', () => {
+            if (selectedFiles.length === 0) return;
+
+            uploadBtn.disabled = true;
+            const originalContent = btnText.innerHTML;
+            btnText.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin mr-2"></i><span>Đang tải lên hệ thống...</span>`;
+            lucide.createIcons();
+
+            // Mô phỏng quá trình tải lên (Mock)
+            setTimeout(() => {
+                uploadBtn.disabled = false;
+                btnText.innerHTML = originalContent;
+                successMessage.classList.remove('hidden');
+                // selectedFiles = []; // Có thể xóa danh sách sau khi tải xong
+                // renderFileList();
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

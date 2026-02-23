@@ -1,277 +1,706 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tải lên tài liệu - Modern Minimalism</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Prism - Nền tảng chia sẻ tài liệu hàng đầu cho sinh viên</title>
+    <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-        
+        /* Biến CSS & Phong cách tổng thể */
         :root {
-            --primary-color: #176754;
-            --primary-hover: #125243;
-            --bg-color: #EBF6F4;
-            --text-dark: #0f2d26;
+            --primary: #1B5E4B;
+            --primary-dark: #144538;
+            --primary-light: #34d399;
+            --accent: #6ee7b7;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-dark);
+            background-color: var(--bg-white);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        .drop-zone--active {
-            border-color: var(--primary-color);
-            background-color: rgba(23, 103, 84, 0.05);
-            transform: scale(1.01);
+        /* Thành phần dùng chung */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
         }
 
-        .animate-fade-in {
-            animation: fadeIn 0.4s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Custom Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-
-        /* Primary Button Styles */
-        .btn-upload {
-            background-color: var(--primary-color);
-            color: white;
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            border-radius: 99px;
+            font-weight: 700;
+            text-decoration: none;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
         }
-        .btn-upload:hover:not(:disabled) {
-            background-color: var(--primary-hover);
-            box-shadow: 0 4px 12px rgba(23, 103, 84, 0.25);
-            transform: translateY(-1px);
+
+        .btn-white {
+            background-color: var(--bg-white);
+            color: var(--primary);
         }
-        .btn-upload:active:not(:disabled) {
-            transform: translateY(0) scale(0.98);
+
+        .btn-white:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
         }
-        .btn-upload:disabled {
-            background-color: #e2e8f0;
-            color: #94a3b8;
-            cursor: not-allowed;
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--accent);
+            color: var(--bg-white);
         }
-        
-        .upload-badge {
-            background-color: white;
-            color: var(--primary-color);
-            border: 1px solid rgba(23, 103, 84, 0.15);
+
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 1. Header */
+        header {
+            background-color: var(--primary);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo h1 {
+            color: var(--bg-white);
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            cursor: pointer;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* 2. Hero Section */
+        .hero {
+            background-color: var(--primary);
+            color: var(--bg-white);
+            padding: 120px 0 180px;
+            text-align: center;
+            position: relative;
+            background-image: radial-gradient(circle at 15% 25%, rgba(52, 211, 153, 0.15) 0%, transparent 45%);
+        }
+
+        .hero h2 {
+            font-size: clamp(40px, 7vw, 72px);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -2px;
+        }
+
+        .hero p {
+            font-size: clamp(18px, 2.2vw, 24px);
+            color: #d1fae5;
+            max-width: 800px;
+            margin: 0 auto 56px;
+            font-weight: 300;
+        }
+
+        /* Thanh tìm kiếm nổi bật */
+        .hero-search-wrapper {
+            max-width: 800px;
+            margin: 0 auto 48px;
+            position: relative;
+            padding: 0 20px;
+        }
+
+        .hero-search-wrapper input {
+            width: 100%;
+            padding: 28px 32px 28px 76px;
+            border-radius: 99px;
+            border: none;
+            font-size: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            outline: none;
+            color: var(--text-main);
+        }
+
+        .hero-search-wrapper i {
+            position: absolute;
+            left: 48px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            width: 32px;
+            height: 32px;
+        }
+
+        /* 3. Stats Section */
+        .stats-wrap {
+            margin-top: -90px;
+            position: relative;
+            z-index: 100;
+        }
+
+        .stats-card {
+            background-color: var(--bg-white);
+            padding: 50px;
+            border-radius: 40px;
+            box-shadow: 0 30px 60px -12px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 40px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-box {
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .stat-box h3 {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+
+        .stat-box span {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            font-weight: 800;
+        }
+
+        /* 4. Benefits Section */
+        .benefits-section {
+            padding: 120px 0;
+            background-color: var(--bg-white);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 72px;
+        }
+
+        .section-header h2 {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: var(--primary-dark);
+        }
+
+        .section-header p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .benefit-grid {
+            display: grid;
+            grid-template-cols: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+        }
+
+        .benefit-card {
+            padding: 50px;
+            border-radius: 32px;
+            background-color: var(--bg-light);
+            transition: all 0.4s ease;
+            border: 1px solid transparent;
+        }
+
+        .benefit-card:hover {
+            background-color: var(--bg-white);
+            border-color: var(--accent);
+            transform: translateY(-12px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .benefit-icon-box {
+            width: 72px;
+            height: 72px;
+            background-color: #dcfce7;
+            color: var(--primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+
+        /* 5. Trending & Categories */
+        .content-section {
+            padding: 100px 0;
+            background-color: var(--bg-light);
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 10px 0 50px;
+            scrollbar-width: none;
+            justify-content: center;
+        }
+
+        .category-tab {
+            padding: 10px 24px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 99px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-tab:hover, .category-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .document-grid {
+            display: grid;
+            grid-template-cols: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+        }
+
+        .doc-card-item {
+            background: var(--bg-white);
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .doc-card-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -10px rgba(0,0,0,0.1);
+        }
+
+        .doc-card-thumb {
+            height: 240px;
+            background-color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .doc-card-thumb i { color: #cbd5e1; }
+
+        .page-tag {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            background: rgba(27, 94, 75, 0.9);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .doc-card-body { padding: 24px; }
+
+        .doc-card-body h4 {
+            font-size: 16px;
+            line-height: 1.4;
+            margin-bottom: 16px;
+            height: 45px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .doc-card-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* 6. Testimonials */
+        .testimonials-section {
+            padding: 120px 0;
+        }
+
+        .testimonial-row {
+            display: grid;
+            grid-template-cols: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 40px;
+        }
+
+        .testimonial-item {
+            padding: 40px;
+            border-radius: 32px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-white);
+            position: relative;
+        }
+
+        .testimonial-item i.quote {
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+
+        .testimonial-text-content {
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 32px;
+            font-style: italic;
+        }
+
+        .user-block {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-init {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+        }
+
+        /* 7. Footer */
+        footer {
+            background-color: var(--primary);
+            color: var(--bg-white);
+            padding: 100px 0 40px;
+        }
+
+        .footer-cols {
+            display: grid;
+            grid-template-cols: 2fr 1fr 1fr;
+            gap: 80px;
+            margin-bottom: 80px;
+        }
+
+        .brand-col h2 { font-size: 42px; margin-bottom: 24px; letter-spacing: -2px; }
+        .brand-col p { color: #a7f3d0; max-width: 320px; margin-bottom: 32px; }
+
+        .footer-col h4 { font-size: 20px; margin-bottom: 28px; font-weight: 800; }
+        .footer-col ul { list-style: none; }
+        .footer-col li { margin-bottom: 14px; }
+        .footer-col a { color: #a7f3d0; text-decoration: none; transition: 0.2s; }
+        .footer-col a:hover { color: white; padding-left: 5px; }
+
+        .social-wrap { display: flex; gap: 16px; }
+        .social-circle {
+            width: 44px;
+            height: 44px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s;
+        }
+        .social-circle:hover { background: white; color: var(--primary); border-color: white; transform: scale(1.1); }
+
+        .bottom-line {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 14px;
+            color: #6ee7b7;
+        }
+
+        @media (max-width: 768px) {
+            .footer-cols { grid-template-cols: 1fr; gap: 40px; }
+            .nav-actions { display: none; }
+            .stats-card { padding: 30px; }
         }
     </style>
 </head>
-<body class="min-h-screen p-6 md:p-12 flex flex-col items-center">
+<body>
 
-    <!-- Header -->
-    <div class="w-full max-w-2xl text-center mb-12">
-        <h1 class="text-4xl font-light tracking-tight mb-3 text-[#176754]">Tải lên tài liệu</h1>
-        <p class="text-slate-600 font-light text-lg">Hệ thống lưu trữ tài liệu tối giản và an toàn.</p>
-    </div>
-
-    <div class="w-full max-w-2xl space-y-8">
-        
-        <!-- Upload Zone -->
-        <div id="drop-zone" class="relative group border-2 border-dashed border-slate-200 bg-white rounded-3xl p-12 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer hover:border-[#176754]/40 hover:shadow-sm">
-            <input type="file" id="file-input" multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-            
-            <div id="upload-icon-container" class="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-6 transition-colors duration-300">
-                <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-400 group-hover:text-[#176754] transition-colors"></i>
+    <!-- Header Navigation -->
+    <header>
+        <div class="container nav-inner">
+            <div class="logo">
+                <h1>Prism</h1>
             </div>
-
-            <div class="text-center">
-                <p class="text-lg font-medium mb-1">Kéo và thả tệp vào đây</p>
-                <p class="text-sm text-slate-400 font-light">hoặc nhấn để duyệt tệp từ thiết bị</p>
-            </div>
-            
-            <div class="mt-6 flex gap-3">
-                <span class="px-3 py-1 upload-badge rounded-full text-[10px] font-semibold uppercase tracking-wider">PDF</span>
-                <span class="px-3 py-1 upload-badge rounded-full text-[10px] font-semibold uppercase tracking-wider">DOCX</span>
-                <span class="px-3 py-1 upload-badge rounded-full text-[10px] font-semibold uppercase tracking-wider">IMAGE</span>
+            <div class="nav-actions">
+                <a href="#" style="color: white; text-decoration: none; font-weight: 600; font-size: 14px;">Khám phá</a>
+                <a href="#" class="btn btn-white" style="padding: 10px 24px; font-size: 14px;">Đăng nhập</a>
             </div>
         </div>
+    </header>
 
-        <!-- File List Container -->
-        <div id="file-list-container" class="hidden bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden animate-fade-in">
-            <div class="px-6 py-4 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
-                <h3 id="file-count-label" class="text-sm font-semibold text-slate-700">Danh sách tệp (0)</h3>
-                <button id="clear-all" class="text-xs text-slate-400 hover:text-red-500 transition-colors">Xóa tất cả</button>
-            </div>
-            <div id="file-list" class="divide-y divide-slate-50 max-h-[300px] overflow-y-auto custom-scrollbar">
-                <!-- File items injected here -->
-            </div>
-        </div>
-
-        <!-- Feedback Message -->
-        <div id="success-message" class="hidden p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center space-x-3 text-emerald-700 animate-fade-in">
-            <i data-lucide="check-circle" class="w-5 h-5"></i>
-            <span class="text-sm font-medium">Tải lên thành công! Tài liệu của bạn đã được lưu trữ.</span>
-        </div>
-
-        <!-- Action Button -->
-        <button id="upload-btn" disabled class="w-full py-4 rounded-2xl font-medium flex items-center justify-center space-x-2 btn-upload">
-            <span id="btn-text">Bắt đầu tải lên</span>
-        </button>
-
-        <!-- Footer Info -->
-        <div class="text-center pt-4">
-            <p class="text-xs text-slate-400 flex items-center justify-center space-x-2">
-                <i data-lucide="shield-check" class="w-4 h-4 text-[#176754]"></i>
-                <span>Tài liệu được mã hóa đầu cuối. Tối đa 50MB/tệp.</span>
-            </p>
-        </div>
-    </div>
-
-    <script>
-        // Khởi tạo icons Lucide
-        lucide.createIcons();
-
-        const dropZone = document.getElementById('drop-zone');
-        const fileInput = document.getElementById('file-input');
-        const fileList = document.getElementById('file-list');
-        const fileListContainer = document.getElementById('file-list-container');
-        const fileCountLabel = document.getElementById('file-count-label');
-        const clearAllBtn = document.getElementById('clear-all');
-        const uploadBtn = document.getElementById('upload-btn');
-        const btnText = document.getElementById('btn-text');
-        const successMessage = document.getElementById('success-message');
-        const uploadIconContainer = document.getElementById('upload-icon-container');
-
-        let selectedFiles = [];
-
-        // Xử lý kéo thả (Drag & Drop)
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                dropZone.classList.add('drop-zone--active');
-                uploadIconContainer.classList.replace('bg-slate-50', 'bg-emerald-50');
-            }, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                dropZone.classList.remove('drop-zone--active');
-                uploadIconContainer.classList.replace('bg-emerald-50', 'bg-slate-50');
-            }, false);
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            const files = Array.from(e.dataTransfer.files);
-            addFiles(files);
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            const files = Array.from(e.target.files);
-            addFiles(files);
-        });
-
-        function addFiles(newFiles) {
-            newFiles.forEach(file => {
-                const isDuplicate = selectedFiles.some(f => f.name === file.name && f.size === file.size);
-                if (!isDuplicate) {
-                    selectedFiles.push(file);
-                }
-            });
-            successMessage.classList.add('hidden');
-            renderFileList();
-        }
-
-        function removeFile(index) {
-            selectedFiles.splice(index, 1);
-            renderFileList();
-        }
-
-        function formatSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function getFileIconName(type) {
-            if (type.includes('image')) return 'image';
-            if (type.includes('video')) return 'video';
-            if (type.includes('audio')) return 'music';
-            return 'file-text';
-        }
-
-        function renderFileList() {
-            fileList.innerHTML = '';
-            
-            if (selectedFiles.length > 0) {
-                fileListContainer.classList.remove('hidden');
-                fileCountLabel.textContent = `Danh sách tệp (${selectedFiles.length})`;
-                uploadBtn.disabled = false;
-            } else {
-                fileListContainer.classList.add('hidden');
-                uploadBtn.disabled = true;
-            }
-
-            selectedFiles.forEach((file, index) => {
-                const item = document.createElement('div');
-                item.className = 'px-6 py-4 flex items-center justify-between group hover:bg-slate-50/50 transition-colors';
+    <main>
+        <!-- 1. Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h2>Kết nối tri thức,<br><span style="color: var(--accent);">Nâng tầm kỹ năng</span></h2>
+                <p>Nền tảng chia sẻ tài liệu hàng đầu cho sinh viên Việt Nam. Tìm kiếm giáo trình, đề thi và kinh nghiệm học tập ngay lập tức.</p>
                 
-                const iconName = getFileIconName(file.type);
+                <div class="hero-search-wrapper">
+                    <i data-lucide="search"></i>
+                    <input type="text" placeholder="Bạn cần tìm tài liệu gì hôm nay?">
+                </div>
 
-                item.innerHTML = `
-                    <div class="flex items-center space-x-4">
-                        <div class="p-2 bg-white border border-slate-100 rounded-xl">
-                            <i data-lucide="${iconName}" class="w-5 h-5 text-[#176754]"></i>
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <a href="#trending" class="btn btn-white">Khám phá ngay</a>
+                    <a href="#" class="btn btn-outline">
+                        <i data-lucide="plus"></i> Tải lên tài liệu
+                    </a>
+                </div>
+
+                <!-- 2. Stats Section -->
+                <div class="container stats-wrap">
+                    <div class="stats-card">
+                        <div class="stat-box">
+                            <h3>90K+</h3>
+                            <span>Tài liệu đã chia sẻ</span>
                         </div>
-                        <div>
-                            <p class="text-sm font-medium text-slate-900 truncate max-w-[200px] md:max-w-xs">${file.name}</p>
-                            <p class="text-xs text-slate-400">${formatSize(file.size)}</p>
+                        <div class="stat-box">
+                            <h3>250K+</h3>
+                            <span>Người dùng hoạt động</span>
+                        </div>
+                        <div class="stat-box">
+                            <h3>20K+</h3>
+                            <span>Lượt tải về mỗi ngày</span>
                         </div>
                     </div>
-                    <button onclick="removeFile(${index})" class="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all md:opacity-0 group-hover:opacity-100">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
-                `;
-                fileList.appendChild(item);
-            });
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Benefits Section -->
+        <section class="benefits-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Tại sao bạn nên chọn Prism?</h2>
+                    <p>Chúng tôi kiến tạo cộng đồng học thuật chất lượng nhất cho sinh viên.</p>
+                </div>
+                <div class="benefit-grid">
+                    <div class="benefit-card">
+                        <div class="benefit-icon-box"><i data-lucide="shield-check"></i></div>
+                        <h4>Miễn phí & Chất lượng</h4>
+                        <p>Kho tài liệu khổng lồ được kiểm duyệt kỹ lưỡng từ các giảng viên và sinh viên ưu tú, hoàn toàn miễn phí truy cập.</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon-box"><i data-lucide="users"></i></div>
+                        <h4>Cộng đồng lớn mạnh</h4>
+                        <p>Kết nối với sinh viên cùng chuyên ngành từ mọi miền Tổ quốc để cùng nhau thảo luận và tiến bộ.</p>
+                    </div>
+                    <div class="benefit-card">
+                        <div class="benefit-icon-box"><i data-lucide="folder-search"></i></div>
+                        <h4>Lưu trữ thông minh</h4>
+                        <p>Hệ thống quản lý tài liệu cá nhân tối ưu, giúp bạn dễ dàng tìm lại những kiến thức quan trọng chỉ với vài cú nhấp chuột.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Trending & Category Section -->
+        <section class="content-section" id="trending">
+            <div class="container">
+                <div class="section-header" style="text-align: left; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h2>Tài liệu nổi bật nhất</h2>
+                        <p>Xu hướng tri thức được cộng đồng quan tâm tuần này.</p>
+                    </div>
+                    <a href="#" style="color: var(--primary); font-weight: 800; text-decoration: none;">Xem tất cả <i data-lucide="chevron-right" style="vertical-align: middle;"></i></a>
+                </div>
+
+                <!-- Chuyên mục nhanh -->
+                <div class="category-tabs">
+                    <button class="category-tab active">Tất cả</button>
+                    <button class="category-tab">Công nghệ thông tin</button>
+                    <button class="category-tab">Kinh tế - Tài chính</button>
+                    <button class="category-tab">Ngoại ngữ</button>
+                    <button class="category-tab">Kỹ năng mềm</button>
+                    <button class="category-tab">Y Dược</button>
+                </div>
+
+                <div class="document-grid" id="docGrid">
+                    <!-- Tài liệu được render bởi JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Testimonials -->
+        <section class="testimonials-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Sinh viên nói gì về Prism?</h2>
+                </div>
+                <div class="testimonial-row">
+                    <div class="testimonial-item">
+                        <i data-lucide="quote" class="quote"></i>
+                        <p class="testimonial-text-content">"Nhờ Prism mà mình đã tìm được những bộ đề thi từ các năm trước rất hiếm. Giao diện cực kỳ thân thiện và dễ tìm kiếm tài liệu."</p>
+                        <div class="user-block">
+                            <div class="user-init">NH</div>
+                            <div class="user-info-text">
+                                <h5 style="font-weight: 800;">Nguyễn Huy</h5>
+                                <p style="font-size: 13px; color: var(--text-muted);">Đại học Bách Khoa Hà Nội</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-item">
+                        <i data-lucide="quote" class="quote"></i>
+                        <p class="testimonial-text-content">"Kho tài liệu Kinh tế ở đây rất chất lượng. Mình thường xuyên tải lên các bài tiểu luận của mình để đóng góp cho cộng đồng."</p>
+                        <div class="user-block">
+                            <div class="user-init" style="background-color: #f97316;">ML</div>
+                            <div class="user-info-text">
+                                <h5 style="font-weight: 800;">Mai Lan</h5>
+                                <p style="font-size: 13px; color: var(--text-muted);">Đại học Ngoại Thương</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action Cuối trang -->
+        <section style="padding-bottom: 120px;">
+            <div class="container">
+                <div style="background-color: var(--primary-dark); border-radius: 50px; padding: 100px 40px; text-align: center; color: white; position: relative; overflow: hidden;">
+                    <h2 style="font-size: 40px; font-weight: 900; margin-bottom: 24px; position: relative; z-index: 5;">Sẵn sàng chia sẻ tri thức?</h2>
+                    <p style="font-size: 20px; color: #a7f3d0; margin-bottom: 48px; position: relative; z-index: 5;">Tham gia cùng hàng nghìn sinh viên khác ngay hôm nay.</p>
+                    <a href="#" class="btn btn-white" style="font-size: 20px; padding: 18px 56px; position: relative; z-index: 5;">Tải tài liệu lên ngay</a>
+                    
+                    <div style="position: absolute; top: -50px; right: -50px; width: 300px; height: 300px; background-color: var(--primary); border-radius: 50%; opacity: 0.4;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer - Dựa trên mẫu ảnh cung cấp -->
+    <footer>
+        <div class="container">
+            <div class="footer-cols">
+                <div class="brand-col">
+                    <h2>Prism</h2>
+                    <p>Nơi khơi nguồn sáng tạo, kết nối tri thức và phát triển kỹ năng mềm cho thế hệ trẻ.</p>
+                    <div class="social-wrap">
+                        <a href="#" class="social-circle"><i data-lucide="facebook"></i></a>
+                        <a href="#" class="social-circle"><i data-lucide="instagram"></i></a>
+                        <a href="#" class="social-circle"><i data-lucide="youtube"></i></a>
+                        <a href="#" class="social-circle">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" /></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Thông tin & hỗ trợ</h4>
+                    <ul>
+                        <li><a href="#">Giới thiệu</a></li>
+                        <li><a href="#">Điều khoản sử dụng</a></li>
+                        <li><a href="#">Chính sách bảo mật</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Kết nối cộng đồng</h4>
+                    <p style="font-size: 14px; margin-bottom: 12px; color: #a7f3d0;">Email hỗ trợ:</p>
+                    <a href="mailto:prism.studio.@gmail.com" style="font-weight: 700;">prism.studio.@gmail.com</a>
+                </div>
+            </div>
+            <div class="bottom-line">
+                © 2026 Prism Studio. Bảo lưu mọi quyền. Phát triển cộng đồng bền vững.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Khởi tạo icons
+        lucide.createIcons();
+
+        // Dữ liệu mẫu tài liệu
+        const featuredDocs = [
+            { title: 'Mối quan hệ biện chứng giữa vật chất và ý thức', pages: 3, type: 'Triết học' },
+            { title: 'Khảo sát Khách Hàng - Đánh Giá Dịch Vụ 2025', pages: 2, type: 'Kinh tế' },
+            { title: 'Giáo trình GDQP HP1-2: Nội dung cơ bản nhất', pages: 138, type: 'Quân sự' },
+            { title: 'Kỹ Thuật Bắn Súng Tiểu Liên AK - Lý thuyết', pages: 13, type: 'Quân sự' },
+            { title: 'Hướng dẫn Đồ án Phát triển Hệ thống Thông tin', pages: 9, type: 'CNTT' },
+            { title: 'Đề cương ôn tập Triết học Mác-Lênin (mới nhất)', pages: 45, type: 'Triết học' },
+            { title: 'Tổng hợp công thức Toán cao cấp A1 - Giải tích', pages: 12, type: 'Toán học' },
+            { title: 'Slide bài giảng Kinh tế vĩ mô - Chương 2', pages: 18, type: 'Kinh tế' }
+        ];
+
+        // Hàm render tài liệu
+        function renderDocs() {
+            const grid = document.getElementById('docGrid');
+            grid.innerHTML = featuredDocs.map(doc => `
+                <div class="doc-card-item">
+                    <div class="doc-card-thumb">
+                        <i data-lucide="file-text" size="80" stroke-width="1"></i>
+                        <span class="page-tag">${doc.pages} trang</span>
+                    </div>
+                    <div class="doc-card-body">
+                        <h4>${doc.title}</h4>
+                        <div class="doc-card-footer">
+                            <span><i data-lucide="file" style="width:12px; margin-right:4px; vertical-align:middle;"></i> ${doc.type}</span>
+                            <span><i data-lucide="download" style="width:12px; margin-right:4px; vertical-align:middle;"></i> 2.8k</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
             
             lucide.createIcons();
         }
 
-        clearAllBtn.addEventListener('click', () => {
-            selectedFiles = [];
-            renderFileList();
-        });
+        // Chạy khi tải trang
+        window.addEventListener('DOMContentLoaded', renderDocs);
 
-        uploadBtn.addEventListener('click', () => {
-            if (selectedFiles.length === 0) return;
-
-            uploadBtn.disabled = true;
-            const originalContent = btnText.innerHTML;
-            btnText.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin mr-2"></i><span>Đang tải lên hệ thống...</span>`;
-            lucide.createIcons();
-
-            // Mô phỏng quá trình tải lên (Mock)
-            setTimeout(() => {
-                uploadBtn.disabled = false;
-                btnText.innerHTML = originalContent;
-                successMessage.classList.remove('hidden');
-                // selectedFiles = []; // Có thể xóa danh sách sau khi tải xong
-                // renderFileList();
-            }, 2000);
+        // Hiệu ứng tab chuyên mục
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelector('.category-tab.active').classList.remove('active');
+                this.classList.add('active');
+            });
         });
     </script>
 </body>
